@@ -771,10 +771,8 @@
         <!-- CATEGORY TABS -->
         <div class="category-tabs">
             <button class="tab-btn active" onclick="filterCategory('ALL', this)">All Collections</button>
-            <button class="tab-btn" onclick="filterCategory('SUITS', this)">Suits & Tuxedos</button>
-            <button class="tab-btn" onclick="filterCategory('WATCHES', this)">Fine Timepieces</button>
-            <button class="tab-btn" onclick="filterCategory('LEATHER', this)">Leather & Bags</button>
-            <button class="tab-btn" onclick="filterCategory('ACCESSORIES', this)">Accessories</button>
+            <button class="tab-btn" onclick="filterCategory('WOMEN', this)">Women's Haute Couture</button>
+            <button class="tab-btn" onclick="filterCategory('MEN', this)">Men's Fine Collection</button>
         </div>
 
         <!-- 3D TILT PRODUCT CARDS GRID -->
@@ -902,15 +900,24 @@
         });
 
         // ----------------------------------------------------
-        // 2. PRODUCT DATA & CARTS APPLICATION LOGIC
+        // 2. PRODUCT DATA FROM LUXURY_CLOTHING SQL DATABASE
         // ----------------------------------------------------
         const products = [
-            { id: 'PROD123', name: 'Italian Silk Tuxedo', category: 'SUITS', price: 45000, stock: 10, icon: '👔' },
-            { id: 'PROD789', name: 'Swiss Chronograph Watch', category: 'WATCHES', price: 120000, stock: 5, icon: '⌚' },
-            { id: 'PROD101', name: 'Designer Leather Handbag', category: 'LEATHER', price: 65000, stock: 8, icon: '👜' },
-            { id: 'PROD456', name: 'Luxury Leather Belt', category: 'LEATHER', price: 800, stock: 2, icon: '🥋' },
-            { id: 'PROD303', name: 'Diamond Cufflinks', category: 'ACCESSORIES', price: 15000, stock: 12, icon: '💎' },
-            { id: 'PROD999', name: 'Rare Out-of-Stock Piece', category: 'SUITS', price: 95000, stock: 0, icon: '👑' }
+            // WOMEN'S COLLECTION
+            { id: 'WT001', name: 'Royal Silk Top (Gucci)', category: 'WOMEN', price: 8500, stock: 10, icon: '👚' },
+            { id: 'WT002', name: 'Luxury Cashmere Top (Prada)', category: 'WOMEN', price: 12000, stock: 8, icon: '🧥' },
+            { id: 'WD001', name: 'Royal Evening Gown (Dior)', category: 'WOMEN', price: 18000, stock: 6, icon: '👗' },
+            { id: 'WK001', name: 'Royal Embroidered Kurti (Gucci)', category: 'WOMEN', price: 7500, stock: 8, icon: '👘' },
+            { id: 'WJKT001', name: 'Women Leather Jacket (Gucci)', category: 'WOMEN', price: 28000, stock: 5, icon: '🧥' },
+            { id: 'WJ001', name: 'Premium Slim Fit Jeans (Gucci)', category: 'WOMEN', price: 7500, stock: 9, icon: '👖' },
+
+            // MEN'S COLLECTION
+            { id: 'MS001', name: 'Royal Oxford Shirt (Gucci)', category: 'MEN', price: 8500, stock: 12, icon: '👔' },
+            { id: 'MS002', name: 'Luxury Silk Shirt (Prada)', category: 'MEN', price: 15000, stock: 6, icon: '👔' },
+            { id: 'MP001', name: 'Tailored Wool Trousers (Gucci)', category: 'MEN', price: 9000, stock: 10, icon: '👖' },
+            { id: 'MJKT001', name: 'Men Leather Jacket (Gucci)', category: 'MEN', price: 30000, stock: 7, icon: '🧥' },
+            { id: 'MH001', name: 'Luxury Cashmere Hoodie (Gucci)', category: 'MEN', price: 15000, stock: 8, icon: '🧥' },
+            { id: 'MSW001', name: 'Cashmere Sweatshirt (Gucci)', category: 'MEN', price: 12000, stock: 10, icon: '👕' }
         ];
 
         let cart = [];

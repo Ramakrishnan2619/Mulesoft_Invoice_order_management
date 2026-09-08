@@ -341,48 +341,93 @@ output application/json
 			<http:error-response statusCode="#[vars.httpStatus default 500]" />
 		</http:listener>
 		<choice doc:name="Choice Mock Product">
+			<when expression="#[attributes.uriParams.productId == 'WT001']">
+				<ee:transform doc:name="WT001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "WT001", "name": "Royal Silk Top (Gucci)", "price": 8500, "stock": 10 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'WT002']">
+				<ee:transform doc:name="WT002">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "WT002", "name": "Luxury Cashmere Top (Prada)", "price": 12000, "stock": 8 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'WD001']">
+				<ee:transform doc:name="WD001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "WD001", "name": "Royal Evening Gown (Dior)", "price": 18000, "stock": 6 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'WJKT001']">
+				<ee:transform doc:name="WJKT001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "WJKT001", "name": "Women Leather Jacket (Gucci)", "price": 28000, "stock": 5 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'MS001']">
+				<ee:transform doc:name="MS001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "MS001", "name": "Royal Oxford Shirt (Gucci)", "price": 8500, "stock": 12 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'MP001']">
+				<ee:transform doc:name="MP001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "MP001", "name": "Tailored Wool Trousers (Gucci)", "price": 9000, "stock": 10 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'MJKT001']">
+				<ee:transform doc:name="MJKT001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "MJKT001", "name": "Men Leather Jacket (Gucci)", "price": 30000, "stock": 7 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'MH001']">
+				<ee:transform doc:name="MH001">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "productId": "MH001", "name": "Luxury Cashmere Hoodie (Gucci)", "price": 15000, "stock": 8 }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
 			<when expression="#[attributes.uriParams.productId == 'PROD123']">
 				<ee:transform doc:name="PROD123">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{
-	"productId": "PROD123",
-	"name": "Italian Silk Tuxedo",
-	"price": 45000,
-	"stock": 10
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'PROD789']">
-				<ee:transform doc:name="PROD789">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"productId": "PROD789",
-	"name": "Swiss Chronograph Watch",
-	"price": 120000,
-	"stock": 5
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'PROD101']">
-				<ee:transform doc:name="PROD101">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"productId": "PROD101",
-	"name": "Designer Leather Handbag",
-	"price": 65000,
-	"stock": 8
-}]]></ee:set-payload>
+{ "productId": "PROD123", "name": "Italian Silk Tuxedo", "price": 45000, "stock": 10 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</when>
@@ -392,27 +437,7 @@ output application/json
 						<ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-{
-	"productId": "PROD456",
-	"name": "Luxury Leather Belt",
-	"price": 800,
-	"stock": 2
-}]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'PROD303']">
-				<ee:transform doc:name="PROD303">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"productId": "PROD303",
-	"name": "Diamond Cufflinks",
-	"price": 15000,
-	"stock": 12
-}]]></ee:set-payload>
+{ "productId": "PROD456", "name": "Luxury Leather Belt", "price": 800, "stock": 2 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 			</when>
