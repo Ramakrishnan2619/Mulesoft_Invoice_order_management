@@ -411,6 +411,34 @@
             box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
         }
 
+        /* TOAST NOTIFICATION */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(18, 18, 28, 0.95);
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-light);
+            padding: 14px 24px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), var(--gold-glow);
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* SHOPPING CART DRAWER MODAL */
         .cart-drawer-overlay {
             position: fixed;
@@ -902,6 +930,21 @@
             renderProducts();
         }
 
+        function showToast(message) {
+            let toast = document.getElementById('toastContainer');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toastContainer';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2200);
+        }
+
         function addToCart(productId) {
             const prod = products.find(p => p.id === productId);
             if (!prod || prod.stock === 0) return;
@@ -912,13 +955,14 @@
                     existing.qty += 1;
                 } else {
                     alert(`Maximum available stock (${prod.stock}) reached for ${prod.name}`);
+                    return;
                 }
             } else {
                 cart.push({ ...prod, qty: 1 });
             }
 
             updateCartUI();
-            openCartDrawer();
+            showToast(`✨ Added <strong>${prod.name}</strong> to Cart!`);
         }
 
         function adjustCartQty(productId, delta) {
