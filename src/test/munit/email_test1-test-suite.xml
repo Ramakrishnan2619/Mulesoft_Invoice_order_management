@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="email_test1-test-suite.xml" />
+	<munit:test name="email_test1-test-suite-mock-product-api-flowTest" doc:id="7ff2005a-868e-4d86-a93c-94ab428ecc18" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to mock-product-api-flow" doc:id="a18d1d1c-a0fe-4168-9b9e-386d8f25f047" name="mock-product-api-flow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>
