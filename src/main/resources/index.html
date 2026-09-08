@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA | Haute Couture & Fine Jewelry</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-dark: #07070a;
+            --bg-card: rgba(18, 18, 28, 0.75);
+            --bg-card-hover: rgba(28, 28, 42, 0.85);
+            --gold-primary: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-dark: #aa7c11;
+            --gold-gradient: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+            --gold-glow: 0 0 25px rgba(212, 175, 55, 0.35);
+            --text-main: #f8f9fa;
+            --text-muted: #9a9ab0;
+            --border-gold: rgba(212, 175, 55, 0.3);
+            --accent-green: #2ed573;
+            --accent-red: #ff4757;
+            --radius-main: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% -20%, #221e38 0%, #07070a 70%);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-x: hidden;
+        }
+
+        /* HEADER & NAVIGATION */
+        header {
+            background: rgba(7, 7, 10, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-gold);
+            padding: 18px 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .logo-box h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            letter-spacing: 6px;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .logo-box p {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .status-badge {
+            background: rgba(46, 213, 115, 0.12);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            color: var(--accent-green);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .cart-trigger-btn {
+            position: relative;
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid var(--border-gold);
+            color: var(--gold-light);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cart-trigger-btn:hover {
+            background: var(--gold-gradient);
+            color: #000;
+            box-shadow: var(--gold-glow);
+            transform: translateY(-2px);
+        }
+
+        .cart-count-badge {
+            background: var(--gold-primary);
+            color: #000;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .cart-trigger-btn:hover .cart-count-badge {
+            background: #000;
+            color: var(--gold-primary);
+        }
+
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1240px;
+            margin: 30px auto;
+            padding: 0 25px;
+        }
+
+        .vip-banner {
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.15) 0%, rgba(170, 124, 17, 0.05) 100%);
+            border: 1px dashed var(--gold-primary);
+            border-radius: 16px;
+            padding: 16px 28px;
+            text-align: center;
+            color: var(--gold-light);
+            font-size: 14px;
+            margin-bottom: 35px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        /* CUSTOMER REGISTRATION CARD */
+        .auth-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-gold);
+            border-radius: var(--radius-main);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--gold-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--gold-primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-gold {
+            background: var(--gold-gradient);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 13px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.45);
+        }
+
+        .user-logged-badge {
+            background: rgba(212, 175, 55, 0.12);
+            border: 1px solid var(--gold-primary);
+            padding: 16px 24px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* CATEGORY FILTER TABS */
+        .category-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-muted);
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active, .tab-btn:hover {
+            background: var(--gold-gradient);
+            color: #000;
+            border-color: var(--gold-primary);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* PRODUCT GRID */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-main);
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--gold-primary);
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7), var(--gold-glow);
+        }
+
+        .product-icon {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+        }
+
+        .product-cat {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .product-title {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .product-price {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--gold-primary);
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-stock {
+            background: rgba(46, 213, 115, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        .badge-low-stock {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .add-to-cart-btn {
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid var(--gold-primary);
+            color: var(--gold-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-to-cart-btn:hover {
+            background: var(--gold-gradient);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        /* CART DRAWER / SIDEBAR MODAL */
+        .cart-drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: flex-end;
+            z-index: 1000;
+        }
+
+        .cart-drawer {
+            background: #11111a;
+            border-left: 2px solid var(--gold-primary);
+            width: 100%;
+            max-width: 460px;
+            height: 100%;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: -15px 0 40px rgba(0,0,0,0.8);
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .drawer-header h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold-primary);
+            font-size: 24px;
+        }
+
+        .close-drawer {
+            font-size: 28px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-drawer:hover {
+            color: #fff;
+        }
+
+        .cart-items-list {
+            flex: 1;
+            overflow-y: auto;
+            margin: 20px 0;
+            padding-right: 5px;
+        }
+
+        .cart-item-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cart-item-icon {
+            font-size: 28px;
+        }
+
+        .cart-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: var(--gold-primary);
+        }
+
+        .cart-qty-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .qty-btn:hover {
+            background: var(--gold-primary);
+            color: #000;
+        }
+
+        .remove-item-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-red);
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .cart-summary-box {
+            background: rgba(212, 175, 55, 0.05);
+            border-top: 1px dashed var(--border-gold);
+            padding-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .summary-row.discount {
+            color: var(--gold-primary);
+            font-weight: 600;
+        }
+
+        .summary-row.total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        /* INVOICE MODAL RECEIPT */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-card {
+            background: #14141f;
+            border: 2px solid var(--gold-primary);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 580px;
+            width: 92%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .invoice-body {
+            background: rgba(255,255,255,0.03);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .invoice-table th, .invoice-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 13px;
+        }
+
+        .invoice-table th {
+            text-align: left;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .email-banner {
+            background: rgba(46, 213, 115, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER NAVIGATION -->
+    <header>
+        <div class="logo-box">
+            <h1>Aura</h1>
+            <p>Haute Couture & Fine Jewelry</p>
+        </div>
+        <div class="header-actions">
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                <span>MuleSoft Engine Active</span>
+            </div>
+            <button class="cart-trigger-btn" onclick="openCartDrawer()">
+                <span>🛒 Shopping Cart</span>
+                <span class="cart-count-badge" id="headerCartCount">0</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- VIP PRIVILEGE BANNER -->
+        <div class="vip-banner">
+            ✨ <strong>VIP Exclusive:</strong> Automatic 10% privilege discount applied to all cart orders above ₹10,000! Instant receipt dispatched to your email.
+        </div>
+
+        <!-- STEP 1: MEMBER IDENTIFICATION -->
+        <div class="auth-card">
+            <div class="section-title">
+                👤 <span>Step 1: VIP Member Identification</span>
+            </div>
+            <div id="authForm" class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="custName" value="Rama Krishna">
+                </div>
+                <div class="form-group">
+                    <label>Email Address (For Invoice Delivery)</label>
+                    <input type="email" id="custEmail" value="sramakrishnan2196@gmail.com">
+                </div>
+                <div class="form-group">
+                    <label>Customer ID / Username</label>
+                    <input type="text" id="custId" value="CUST001">
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn-gold" style="width: 100%;" onclick="registerCustomer()">Save Profile</button>
+                </div>
+            </div>
+            <div id="loggedBadge" class="user-logged-badge" style="display:none;">
+                <div>
+                    <strong style="color:var(--gold-primary);" id="badgeCustName">Rama Krishna</strong> 
+                    <span style="color:var(--text-muted);" id="badgeCustEmail">(sramakrishnan2196@gmail.com)</span>
+                    <br>
+                    <small style="color:var(--accent-green);">✓ Registered & Mapped in MuleSoft Directory [ID: <span id="badgeCustId">CUST001</span>]</small>
+                </div>
+                <button class="tab-btn" onclick="editCustomer()">Edit Profile</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: CATEGORIES & CATALOG -->
+        <div class="section-title">
+            🛍️ <span>Step 2: Browse Haute Couture Catalog</span>
+        </div>
+
+        <!-- CATEGORY TABS -->
+        <div class="category-tabs">
+            <button class="tab-btn active" onclick="filterCategory('ALL', this)">All Collections</button>
+            <button class="tab-btn" onclick="filterCategory('SUITS', this)">Suits & Tuxedos</button>
+            <button class="tab-btn" onclick="filterCategory('WATCHES', this)">Fine Timepieces</button>
+            <button class="tab-btn" onclick="filterCategory('LEATHER', this)">Leather & Bags</button>
+            <button class="tab-btn" onclick="filterCategory('ACCESSORIES', this)">Accessories</button>
+        </div>
+
+        <!-- PRODUCT CARDS GRID -->
+        <div id="productsGrid" class="products-grid">
+            <!-- Cards filled dynamically -->
+        </div>
+    </div>
+
+    <!-- SHOPPING CART DRAWER MODAL -->
+    <div id="cartDrawerOverlay" class="cart-drawer-overlay">
+        <div class="cart-drawer">
+            <div>
+                <div class="drawer-header">
+                    <h2>Your Shopping Cart</h2>
+                    <span class="close-drawer" onclick="closeCartDrawer()">&times;</span>
+                </div>
+
+                <div id="cartItemsList" class="cart-items-list">
+                    <!-- Dynamic cart items -->
+                </div>
+            </div>
+
+            <div class="cart-summary-box">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">₹0</span>
+                </div>
+                <div class="summary-row discount">
+                    <span>VIP Privilege Discount (10%):</span>
+                    <span id="cartDiscount">-₹0</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total Payable:</span>
+                    <span id="cartTotal" style="color:var(--gold-primary);">₹0</span>
+                </div>
+
+                <button id="checkoutBtn" class="btn-gold" style="width: 100%; margin-top: 18px;" onclick="submitCartOrder()">Proceed to Checkout & Invoice</button>
+                <div id="cartError" style="color: var(--accent-red); font-size: 13px; text-align: center; margin-top: 10px; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVOICE RECEIPT MODAL -->
+    <div id="invoiceModal" class="modal-overlay">
+        <div class="modal-card">
+            <div style="text-align: center;">
+                <h2 style="font-family: 'Cinzel', serif; color: var(--gold-primary); letter-spacing: 3px;">AURA INVOICE</h2>
+                <p style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px;">HAUTE COUTURE OFFICIAL RECEIPT</p>
+            </div>
+
+            <div class="email-banner" style="margin-top: 18px;">
+                ✉️ Detailed Invoice sent to <strong id="invRecipientEmail">email</strong> via MuleSoft SMTP!
+            </div>
+
+            <div class="invoice-body" id="invoiceDetails">
+                <!-- Dynamically filled -->
+            </div>
+
+            <button class="btn-gold" style="width: 100%;" onclick="closeInvoiceModal()">Complete Order & Continue</button>
+        </div>
+    </div>
+
+    <script>
+        const products = [
+            { id: 'PROD123', name: 'Italian Silk Tuxedo', category: 'SUITS', price: 45000, stock: 10, icon: '👔' },
+            { id: 'PROD789', name: 'Swiss Chronograph Watch', category: 'WATCHES', price: 120000, stock: 5, icon: '⌚' },
+            { id: 'PROD101', name: 'Designer Leather Handbag', category: 'LEATHER', price: 65000, stock: 8, icon: '👜' },
+            { id: 'PROD456', name: 'Luxury Leather Belt', category: 'LEATHER', price: 800, stock: 2, icon: '🥋' },
+            { id: 'PROD303', name: 'Diamond Cufflinks', category: 'ACCESSORIES', price: 15000, stock: 12, icon: '💎' },
+            { id: 'PROD999', name: 'Rare Out-of-Stock Piece', category: 'SUITS', price: 95000, stock: 0, icon: '👑' }
+        ];
+
+        let cart = [];
+        let activeCategory = 'ALL';
+
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = '';
+
+            const filtered = activeCategory === 'ALL' ? products : products.filter(p => p.category === activeCategory);
+
+            filtered.forEach(prod => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                const stockBadge = prod.stock > 3 
+                    ? `<span class="badge badge-stock">In Stock (${prod.stock})</span>`
+                    : prod.stock > 0 
+                        ? `<span class="badge badge-low-stock">Low Stock (${prod.stock} Left)</span>`
+                        : `<span class="badge badge-low-stock">Out of Stock</span>`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="product-icon">${prod.icon}</div>
+                        <div class="product-cat">${prod.category}</div>
+                        <div class="product-title">${prod.name}</div>
+                        <div class="product-price">₹${prod.price.toLocaleString()}</div>
+                    </div>
+                    <div class="card-footer">
+                        ${stockBadge}
+                        <button class="add-to-cart-btn" onclick="addToCart('${prod.id}')" ${prod.stock === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                            + Add to Cart
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterCategory(cat, btn) {
+            activeCategory = cat;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderProducts();
+        }
+
+        function addToCart(productId) {
+            const prod = products.find(p => p.id === productId);
+            if (!prod || prod.stock === 0) return;
+
+            const existing = cart.find(item => item.id === productId);
+            if (existing) {
+                if (existing.qty < prod.stock) {
+                    existing.qty += 1;
+                } else {
+                    alert(`Maximum available stock (${prod.stock}) reached for ${prod.name}`);
+                }
+            } else {
+                cart.push({ ...prod, qty: 1 });
+            }
+
+            updateCartUI();
+            openCartDrawer();
+        }
+
+        function adjustCartQty(productId, delta) {
+            const item = cart.find(i => i.id === productId);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== productId);
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(i => i.id !== productId);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+            document.getElementById('headerCartCount').innerText = totalCount;
+
+            const list = document.getElementById('cartItemsList');
+            if (cart.length === 0) {
+                list.innerHTML = `<div style="text-align: center; color: var(--text-muted); margin-top: 40px;">
+                    <div style="font-size: 40px;">🛍️</div>
+                    <p>Your shopping cart is currently empty.</p>
+                </div>`;
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="cart-item-card">
+                        <div class="cart-item-info">
+                            <span class="cart-item-icon">${item.icon}</span>
+                            <div>
+                                <div class="cart-item-title">${item.name}</div>
+                                <div class="cart-item-price">₹${item.price.toLocaleString()} each</div>
+                            </div>
+                        </div>
+                        <div class="cart-qty-control">
+                            <button class="qty-btn" onclick="adjustCartQty('${item.id}', -1)">-</button>
+                            <span style="font-weight: 600; width: 20px; text-align: center;">${item.qty}</span>
+                            <button class="qty-btn" onclick="adjustCartQty('${item.id}', 1)">+</button>
+                            <button class="remove-item-btn" onclick="removeFromCart('${item.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const discount = subtotal > 10000 ? (subtotal * 0.10) : 0;
+            const total = subtotal - discount;
+
+            document.getElementById('cartSubtotal').innerText = `₹${subtotal.toLocaleString()}`;
+            document.getElementById('cartDiscount').innerText = `-₹${discount.toLocaleString()}`;
+            document.getElementById('cartTotal').innerText = `₹${total.toLocaleString()}`;
+        }
+
+        function openCartDrawer() {
+            document.getElementById('cartDrawerOverlay').style.display = 'flex';
+        }
+
+        function closeCartDrawer() {
+            document.getElementById('cartDrawerOverlay').style.display = 'none';
+        }
+
+        function registerCustomer() {
+            const name = document.getElementById('custName').value.trim();
+            const email = document.getElementById('custEmail').value.trim();
+            const id = document.getElementById('custId').value.trim();
+
+            if (!name || !email || !id) {
+                alert('Please complete all profile details.');
+                return;
+            }
+
+            fetch('http://localhost:8081/api/customers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customerId: id, name: name, email: email })
+            }).catch(e => console.log(e));
+
+            document.getElementById('badgeCustName').innerText = name;
+            document.getElementById('badgeCustEmail').innerText = `(${email})`;
+            document.getElementById('badgeCustId').innerText = id;
+
+            document.getElementById('authForm').style.display = 'none';
+            document.getElementById('loggedBadge').style.display = 'flex';
+        }
+
+        function editCustomer() {
+            document.getElementById('authForm').style.display = 'grid';
+            document.getElementById('loggedBadge').style.display = 'none';
+        }
+
+        async function submitCartOrder() {
+            const errDiv = document.getElementById('cartError');
+            errDiv.style.display = 'none';
+
+            if (cart.length === 0) {
+                errDiv.innerText = 'Your cart is empty. Add items before checkout.';
+                errDiv.style.display = 'block';
+                return;
+            }
+
+            const custId = document.getElementById('custId').value.trim();
+            const custEmail = document.getElementById('custEmail').value.trim();
+            const custName = document.getElementById('custName').value.trim();
+
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.innerText = '✨ Processing via MuleSoft...';
+            checkoutBtn.disabled = true;
+
+            // Submit primary item or cart items array
+            const firstItem = cart[0];
+            const orderPayload = {
+                customerId: custId,
+                customerName: custName,
+                customerEmail: custEmail,
+                productId: firstItem.id,
+                quantity: firstItem.qty,
+                cartItems: cart.map(i => ({ productId: i.id, productName: i.name, price: i.price, quantity: i.qty }))
+            };
+
+            try {
+                const response = await fetch('http://localhost:8081/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
+                });
+
+                const data = await response.json();
+                checkoutBtn.innerText = 'Proceed to Checkout & Invoice';
+                checkoutBtn.disabled = false;
+
+                if (response.ok && data.success) {
+                    closeCartDrawer();
+                    showInvoiceModal(data.orderDetails, cart, custEmail);
+                    cart = [];
+                    updateCartUI();
+                } else {
+                    errDiv.innerText = `❌ Order Failed: ${data.message || 'Processing error'}`;
+                    errDiv.style.display = 'block';
+                }
+            } catch (err) {
+                checkoutBtn.innerText = 'Proceed to Checkout & Invoice';
+                checkoutBtn.disabled = false;
+                errDiv.innerText = '❌ MuleSoft Service Offline: Ensure app is running on port 8081!';
+                errDiv.style.display = 'block';
+                console.error(err);
+            }
+        }
+
+        function showInvoiceModal(details, purchasedItems, email) {
+            document.getElementById('invRecipientEmail').innerText = email;
+
+            const itemsRows = purchasedItems.map(item => `
+                <tr>
+                    <td>${item.icon} ${item.name}</td>
+                    <td style="text-align:center;">${item.qty}</td>
+                    <td style="text-align:right;">₹${(item.price * item.qty).toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+            const subtotal = purchasedItems.reduce((sum, i) => sum + (i.price * i.qty), 0);
+            const discount = subtotal > 10000 ? (subtotal * 0.10) : 0;
+            const total = subtotal - discount;
+
+            const invHtml = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <strong>Order Reference:</strong>
+                    <span style="color:var(--gold-primary); font-weight:700;">${details.orderId}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <strong>Customer:</strong>
+                    <span>${details.customerName} (${details.customerId})</span>
+                </div>
+
+                <table class="invoice-table">
+                    <thead>
+                        <tr>
+                            <th>Item Description</th>
+                            <th style="text-align:center;">Qty</th>
+                            <th style="text-align:right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsRows}
+                    </tbody>
+                </table>
+
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span>Subtotal:</span>
+                    <span>₹${subtotal.toLocaleString()}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--gold-primary);">
+                    <span>10% VIP Discount:</span>
+                    <span>-₹${discount.toLocaleString()}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2); font-size:16px;">
+                    <strong>Total Amount Paid:</strong>
+                    <strong style="color:var(--gold-primary);">₹${total.toLocaleString()}</strong>
+                </div>
+                <div style="margin-top:15px; font-size:12px; color:var(--text-muted); text-align:center;">
+                    Status: <span style="color:var(--accent-green); font-weight:600;">CONFIRMED & PROCESSED</span>
+                </div>
+            `;
+
+            document.getElementById('invoiceDetails').innerHTML = invHtml;
+            document.getElementById('invoiceModal').style.display = 'flex';
+        }
+
+        function closeInvoiceModal() {
+            document.getElementById('invoiceModal').style.display = 'none';
+        }
+
+        renderProducts();
+        updateCartUI();
+    </script>
+</body>
+</html>

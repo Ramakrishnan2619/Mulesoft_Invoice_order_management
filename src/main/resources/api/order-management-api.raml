@@ -1,0 +1,100 @@
+#%RAML 1.0
+title: Order Management API
+version: v1.0
+baseUri: http://localhost:8081/api
+
+types:
+  CustomerRegistration:
+    type: object
+    properties:
+      customerId: string
+      name: string
+      email: string
+  OrderRequest:
+    type: object
+    properties:
+      customerId: string
+      customerName?: string
+      customerEmail?: string
+      productId: string
+      quantity: integer
+  OrderResponse:
+    type: object
+    properties:
+      success: boolean
+      message: string
+      orderDetails: object
+  ErrorResponse:
+    type: object
+    properties:
+      success: boolean
+      errorType: string
+      message: string
+
+/customers:
+  post:
+    description: Register or map a VIP customer profile in the system directory
+    body:
+      application/json:
+        type: CustomerRegistration
+        example:
+          customerId: "CUST001"
+          name: "Rama Krishna"
+          email: "sramakrishnan2196@gmail.com"
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              success: true
+              message: "Customer profile mapped successfully"
+              customer:
+                customerId: "CUST001"
+                name: "Rama Krishna"
+
+/orders:
+  post:
+    description: Process an order request, validate details, check stock, apply discounts, and generate invoice
+    body:
+      application/json:
+        type: OrderRequest
+        example:
+          customerId: "CUST001"
+          customerName: "Rama Krishna"
+          customerEmail: "sramakrishnan2196@gmail.com"
+          productId: "PROD123"
+          quantity: 1
+    responses:
+      200:
+        body:
+          application/json:
+            type: OrderResponse
+            example:
+              success: true
+              message: "Luxury Fashion Order processed successfully"
+              orderDetails:
+                orderId: "LUX-ORD-9F8A123C"
+                customerId: "CUST001"
+                productId: "PROD123"
+                productName: "Italian Silk Tuxedo"
+                quantity: 1
+                subtotal: 45000
+                discount: 4500
+                totalAmount: 40500
+                status: "CREATED"
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example:
+              success: false
+              errorType: "INSUFFICIENT_STOCK"
+              message: "Insufficient stock available for the requested product."
+      404:
+        body:
+          application/json:
+            type: ErrorResponse
+            example:
+              success: false
+              errorType: "PRODUCT_NOT_FOUND"
+              message: "The requested luxury product could not be found."

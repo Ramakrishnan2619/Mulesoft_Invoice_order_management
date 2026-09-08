@@ -1,0 +1,468 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+		http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+		http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+
+	<!-- GLOBAL CONFIGURATIONS -->
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config">
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration">
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP">
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="mulesoftautomatedbot@gmail.com" password="dtovconmqcoyowzg">
+			<email:properties>
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+				<email:property key="mail.smtp.starttls.required" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+
+	<configuration defaultErrorHandler-ref="global-error-handler" />
+
+	<!-- GLOBAL ERROR HANDLER -->
+	<error-handler name="global-error-handler">
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - Validation/Stock" type="APP:INVALID_INPUT, APP:INSUFFICIENT_STOCK">
+			<ee:transform doc:name="Error Response">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": false,
+	"errorType": error.errorType.identifier,
+	"message": error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - Product Not Found" type="APP:PRODUCT_NOT_FOUND">
+			<ee:transform doc:name="Error Response">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": false,
+	"errorType": "PRODUCT_NOT_FOUND",
+	"message": "The requested luxury product could not be found in our catalog."
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - External API Failure" type="HTTP:CONNECTIVITY, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT">
+			<ee:transform doc:name="External API Failure Response">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": false,
+	"errorType": "EXTERNAL_API_FAILURE",
+	"message": "External API connection failed: " ++ (error.description default "Unable to connect to downstream service.")
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[503]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate - General" type="ANY">
+			<ee:transform doc:name="Error Response">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": false,
+	"errorType": "INTERNAL_SERVER_ERROR",
+	"message": error.description default "An unexpected error occurred during order processing."
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+
+	<!-- FRONTEND UI FLOW -->
+	<flow name="serve-frontend-ui-flow">
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/" allowedMethods="GET">
+			<http:response statusCode="200">
+				<http:headers><![CDATA[#[{"Content-Type": "text/html"}]]]></http:headers>
+			</http:response>
+		</http:listener>
+		<parse-template doc:name="Parse Template" location="index.html"/>
+	</flow>
+
+	<!-- CUSTOMER REGISTRATION / MAPPING FLOW -->
+	<flow name="customer-registration-flow">
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/customers" allowedMethods="POST, OPTIONS">
+			<http:response statusCode="200">
+				<http:headers><![CDATA[#[{
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Headers": "*"
+				}]]]></http:headers>
+			</http:response>
+		</http:listener>
+		<logger level="INFO" doc:name="Log Customer Registration" message="Registering VIP Customer: #[payload]"/>
+		<ee:transform doc:name="Transform Message">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": true,
+	"message": "Customer profile mapped successfully in directory",
+	"customer": {
+		"customerId": payload.customerId default "CUST001",
+		"name": payload.name default "VIP Customer",
+		"email": payload.email default "sramakrishnan2196@gmail.com",
+		"mappedAt": now()
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+
+	<!-- MAIN ORDER PROCESSING FLOW -->
+	<flow name="order-processing-flow">
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/orders" allowedMethods="POST, OPTIONS">
+			<http:response statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[{
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Headers": "*"
+				}]]]></http:headers>
+			</http:response>
+			<http:error-response statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[{
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Headers": "*"
+				}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+
+		<!-- Handle CORS Preflight -->
+		<choice doc:name="Choice CORS Check">
+			<when expression="#[attributes.method == 'OPTIONS']">
+				<ee:transform doc:name="CORS Response">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{ "status": "CORS OK" }]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<!-- Store Request -->
+				<ee:transform doc:name="Store Original Request">
+					<ee:variables>
+						<ee:set-variable variableName="orderRequest"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+
+				<!-- Validate Input -->
+				<validation:is-true doc:name="Validate Input" expression="#[vars.orderRequest.productId != null and vars.orderRequest.quantity != null and vars.orderRequest.quantity &gt; 0]" message="Invalid request: productId and valid quantity &gt; 0 are required.">
+					<error-mapping sourceType="VALIDATION:INVALID_BOOLEAN" targetType="APP:INVALID_INPUT" />
+				</validation:is-true>
+
+				<!-- External Product API Call -->
+				<http:request method="GET" doc:name="Check Product Availability" config-ref="HTTP_Request_configuration" path="#['/api/mock/products/' ++ vars.orderRequest.productId]">
+					<error-mapping sourceType="HTTP:NOT_FOUND" targetType="APP:PRODUCT_NOT_FOUND" />
+				</http:request>
+
+				<ee:transform doc:name="Store Product Info">
+					<ee:variables>
+						<ee:set-variable variableName="productInfo"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+
+				<!-- Stock Check -->
+				<choice doc:name="Choice Stock Check">
+					<when expression="#[vars.productInfo.stock &gt;= vars.orderRequest.quantity]">
+						<logger level="INFO" doc:name="Log Stock OK" message="#['Stock available for product ' ++ vars.productInfo.productId]"/>
+					</when>
+					<otherwise>
+						<raise-error doc:name="Raise Stock Error" type="APP:INSUFFICIENT_STOCK" description="#['Insufficient boutique stock available. Requested: ' ++ vars.orderRequest.quantity ++ ', Available: ' ++ vars.productInfo.stock]"/>
+					</otherwise>
+				</choice>
+
+				<!-- Calculate Amount & 10% Discount -->
+				<ee:transform doc:name="Calculate Amount &amp; Discount">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var hasCart = vars.orderRequest.cartItems != null and sizeOf(vars.orderRequest.cartItems) > 0
+var cartSubtotal = if (hasCart) sum(vars.orderRequest.cartItems map ($.price * $.quantity)) else (vars.productInfo.price * vars.orderRequest.quantity)
+var subtotal = cartSubtotal
+var discount = if (subtotal > 10000) (subtotal * 0.10) else 0
+var finalAmount = subtotal - discount
+---
+{
+	"customerId": vars.orderRequest.customerId default "CUST001",
+	"customerName": vars.orderRequest.customerName default "VIP Customer",
+	"customerEmail": vars.orderRequest.customerEmail default "sramakrishnan2196@gmail.com",
+	"productId": vars.orderRequest.productId,
+	"productName": vars.productInfo.name,
+	"quantity": vars.orderRequest.quantity,
+	"cartItems": if (hasCart) vars.orderRequest.cartItems else [{ productId: vars.orderRequest.productId, productName: vars.productInfo.name, price: vars.productInfo.price, quantity: vars.orderRequest.quantity }],
+	"subtotal": subtotal,
+	"discount": discount,
+	"totalAmount": finalAmount,
+	"status": "CREATED"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+
+				<!-- External Order API Call -->
+				<http:request method="POST" doc:name="Create Order Record" config-ref="HTTP_Request_configuration" path="/api/mock/orders" />
+
+				<ee:transform doc:name="Store Order Result">
+					<ee:variables>
+						<ee:set-variable variableName="orderResult"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+
+				<!-- Prepare Invoice & Notification Email -->
+				<ee:transform doc:name="Prepare Notification &amp; Invoice Email">
+					<ee:variables>
+						<ee:set-variable variableName="emailBody"><![CDATA[%dw 2.0
+output text/plain
+var itemsList = (vars.orderResult.cartItems default []) map (item, idx) -> 
+	(idx + 1) ++ ". " ++ item.productName ++ " (Qty: " ++ item.quantity ++ ") - ₹" ++ (item.price * item.quantity)
+---
+"====================================================\n" ++
+"            AURA LUXURY HAUTE COUTURE INVOICE        \n" ++
+"====================================================\n" ++
+"Order Reference : " ++ vars.orderResult.orderId ++ "\n" ++
+"Customer ID     : " ++ vars.orderResult.customerId ++ "\n" ++
+"Customer Name   : " ++ vars.orderResult.customerName ++ "\n" ++
+"Customer Email  : " ++ vars.orderResult.customerEmail ++ "\n" ++
+"----------------------------------------------------\n" ++
+"ORDERED ITEMS:\n" ++
+(itemsList joinBy "\n") ++ "\n" ++
+"----------------------------------------------------\n" ++
+"Subtotal Amount : ₹" ++ vars.orderResult.subtotal ++ "\n" ++
+"10% VIP Discount: -₹" ++ vars.orderResult.discount ++ "\n" ++
+"Total Charged   : ₹" ++ vars.orderResult.totalAmount ++ "\n" ++
+"Order Status    : CONFIRMED & PROCESSED\n" ++
+"====================================================\n" ++
+"Thank you for shopping with AURA Haute Couture."]]></ee:set-variable>
+						<ee:set-variable variableName="targetEmail"><![CDATA[%dw 2.0
+output application/java
+---
+vars.orderResult.customerEmail default "sramakrishnan2196@gmail.com"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+
+				<!-- Dispatch Email Notification -->
+				<try doc:name="Try Send Email">
+					<email:send config-ref="Email_SMTP" fromAddress="mulesoftautomatedbot@gmail.com" subject="#['AURA Order Confirmation &amp; Invoice - ' ++ vars.orderResult.orderId]" doc:name="Send Email Invoice">
+						<email:to-addresses>
+							<email:to-address value="#[vars.targetEmail]" />
+						</email:to-addresses>
+						<email:body>
+							<email:content><![CDATA[#[vars.emailBody]]]></email:content>
+						</email:body>
+					</email:send>
+					<error-handler>
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue - Email Fallback">
+							<logger level="WARN" doc:name="Log Email Warning" message="Email dispatch failed, but order processing succeeded."/>
+						</on-error-continue>
+					</error-handler>
+				</try>
+
+				<!-- Call Notification API -->
+				<http:request method="POST" doc:name="Send Notification API" config-ref="HTTP_Request_configuration" path="/api/mock/notifications">
+					<http:body><![CDATA[#[%dw 2.0
+output application/json
+---
+{
+	"customerId": vars.orderResult.customerId,
+	"message": "Order " ++ vars.orderResult.orderId ++ " confirmed! Invoice emailed to " ++ vars.orderResult.customerEmail
+}]]]></http:body>
+				</http:request>
+
+				<!-- Final Response -->
+				<ee:transform doc:name="Final Order Response">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"success": true,
+	"message": "Luxury Fashion Order processed successfully and invoice dispatched to email.",
+	"orderDetails": vars.orderResult
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+
+	<!-- MOCK PRODUCT API FLOW -->
+	<flow name="mock-product-api-flow">
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/mock/products/{productId}" allowedMethods="GET">
+			<http:response statusCode="#[vars.httpStatus default 200]" />
+			<http:error-response statusCode="#[vars.httpStatus default 500]" />
+		</http:listener>
+		<choice doc:name="Choice Mock Product">
+			<when expression="#[attributes.uriParams.productId == 'PROD123']">
+				<ee:transform doc:name="PROD123">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"productId": "PROD123",
+	"name": "Italian Silk Tuxedo",
+	"price": 45000,
+	"stock": 10
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'PROD789']">
+				<ee:transform doc:name="PROD789">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"productId": "PROD789",
+	"name": "Swiss Chronograph Watch",
+	"price": 120000,
+	"stock": 5
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'PROD101']">
+				<ee:transform doc:name="PROD101">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"productId": "PROD101",
+	"name": "Designer Leather Handbag",
+	"price": 65000,
+	"stock": 8
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'PROD456']">
+				<ee:transform doc:name="PROD456">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"productId": "PROD456",
+	"name": "Luxury Leather Belt",
+	"price": 800,
+	"stock": 2
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression="#[attributes.uriParams.productId == 'PROD303']">
+				<ee:transform doc:name="PROD303">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"productId": "PROD303",
+	"name": "Diamond Cufflinks",
+	"price": 15000,
+	"stock": 12
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Product Not Found">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"error": "Product not found"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+
+	<!-- MOCK ORDER API FLOW -->
+	<flow name="mock-order-api-flow">
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/mock/orders" allowedMethods="POST"/>
+		<ee:transform doc:name="Generate Order ID">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload ++ {
+	"orderId": "LUX-ORD-" ++ upper(uuid()[0 to 7])
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+
+	<!-- MOCK NOTIFICATION API FLOW -->
+	<flow name="mock-notification-api-flow">
+		<http:listener doc:name="Listener" config-ref="HTTP_Listener_config" path="/api/mock/notifications" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Log Notification" message="Mock Notification Processed: #[payload]"/>
+		<ee:transform doc:name="Notification Response">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"status": "Notification Delivered"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+
+</mule>

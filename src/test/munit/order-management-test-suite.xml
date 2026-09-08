@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit"
+	xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+
+	<munit:config name="order-management-test-suite.xml" />
+
+	<!-- TEST 1: SUCCESSFUL ORDER PROCESSING WITH 10% VIP DISCOUNT -->
+	<munit:test name="order-processing-flow-success-test" doc:id="test-success-01" description="Test successful order processing and 10% discount calculation">
+		<munit:execution>
+			<munit:set-event doc:name="Set Event Request Payload">
+				<munit:payload value="#[{ customerId: 'CUST001', customerName: 'Rama Krishna', customerEmail: 'sramakrishnan2196@gmail.com', productId: 'PROD123', quantity: 1 }]" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Call order-processing-flow" name="order-processing-flow" />
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-that doc:name="Assert Success True" expression="#[payload.success]" is="#[munit-tools::equalTo(true)]" />
+			<munit-tools:assert-that doc:name="Assert Subtotal" expression="#[payload.orderDetails.subtotal]" is="#[munit-tools::equalTo(45000)]" />
+			<munit-tools:assert-that doc:name="Assert Discount Applied" expression="#[payload.orderDetails.discount]" is="#[munit-tools::equalTo(4500)]" />
+			<munit-tools:assert-that doc:name="Assert Final Total" expression="#[payload.orderDetails.totalAmount]" is="#[munit-tools::equalTo(40500)]" />
+		</munit:validation>
+	</munit:test>
+
+	<!-- TEST 2: PRODUCT NOT FOUND SCENARIO -->
+	<munit:test name="order-processing-flow-product-not-found-test" doc:id="test-err-01" description="Test product not found handling" expectedErrorType="APP:PRODUCT_NOT_FOUND">
+		<munit:execution>
+			<munit:set-event doc:name="Set Event Payload">
+				<munit:payload value="#[{ customerId: 'CUST001', productId: 'PROD_INVALID_999', quantity: 1 }]" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Call order-processing-flow" name="order-processing-flow" />
+		</munit:execution>
+	</munit:test>
+
+	<!-- TEST 3: INSUFFICIENT STOCK SCENARIO -->
+	<munit:test name="order-processing-flow-insufficient-stock-test" doc:id="test-err-02" description="Test stock validation exception" expectedErrorType="APP:INSUFFICIENT_STOCK">
+		<munit:execution>
+			<munit:set-event doc:name="Set Event Payload">
+				<munit:payload value="#[{ customerId: 'CUST001', productId: 'PROD456', quantity: 50 }]" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Call order-processing-flow" name="order-processing-flow" />
+		</munit:execution>
+	</munit:test>
+
+	<!-- TEST 4: INVALID INPUT VALIDATION SCENARIO -->
+	<munit:test name="order-processing-flow-invalid-input-test" doc:id="test-err-03" description="Test invalid input quantity validation" expectedErrorType="APP:INVALID_INPUT">
+		<munit:execution>
+			<munit:set-event doc:name="Set Event Payload">
+				<munit:payload value="#[{ customerId: 'CUST001', productId: 'PROD123', quantity: 0 }]" mediaType="application/json" />
+			</munit:set-event>
+			<flow-ref doc:name="Call order-processing-flow" name="order-processing-flow" />
+		</munit:execution>
+	</munit:test>
+
+</mule>
