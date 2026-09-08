@@ -393,6 +393,45 @@
             border: 1px solid rgba(255, 71, 87, 0.35);
         }
 
+        .card-qty-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 2px 8px;
+        }
+
+        .qty-btn-card {
+            background: transparent;
+            border: none;
+            color: var(--gold-primary);
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .qty-btn-card:hover {
+            background: var(--gold-primary);
+            color: #000;
+        }
+
+        .card-qty-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            min-width: 18px;
+            text-align: center;
+        }
+
         .add-to-cart-btn {
             background: rgba(212, 175, 55, 0.15);
             border: 1px solid var(--gold-primary);
@@ -875,7 +914,20 @@
         ];
 
         let cart = [];
+        let cardQuantities = {};
         let activeCategory = 'ALL';
+
+        function adjustCardQty(productId, delta) {
+            const prod = products.find(p => p.id === productId);
+            if (!prod || prod.stock === 0) return;
+
+            const current = cardQuantities[productId] || 1;
+            const nextVal = Math.max(1, Math.min(prod.stock, current + delta));
+            cardQuantities[productId] = nextVal;
+
+            const el = document.getElementById(`cardQty-${productId}`);
+            if (el) el.innerText = nextVal;
+        }
 
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
@@ -886,6 +938,8 @@
             filtered.forEach(prod => {
                 const card = document.createElement('div');
                 card.className = 'product-card';
+
+                const cardQty = cardQuantities[prod.id] || 1;
 
                 // Add 3D Tilt Effect on mouse move
                 card.addEventListener('mousemove', (e) => {
@@ -912,9 +966,16 @@
                         <div class="product-title">${prod.name}</div>
                         <div class="product-price">₹${prod.price.toLocaleString()}</div>
                     </div>
-                    <div class="card-footer">
-                        ${stockBadge}
-                        <button class="add-to-cart-btn" onclick="addToCart('${prod.id}')" ${prod.stock === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                    <div class="card-footer" style="flex-direction: column; align-items: stretch; gap: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            ${stockBadge}
+                            <div class="card-qty-control" ${prod.stock === 0 ? 'style="opacity:0.4; pointer-events:none;"' : ''}>
+                                <button class="qty-btn-card" onclick="adjustCardQty('${prod.id}', -1)">-</button>
+                                <span id="cardQty-${prod.id}" class="card-qty-val">${cardQty}</span>
+                                <button class="qty-btn-card" onclick="adjustCardQty('${prod.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <button class="add-to-cart-btn" style="width: 100%; text-align: center;" onclick="addToCart('${prod.id}')" ${prod.stock === 0 ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
                             + Add to Cart
                         </button>
                     </div>
@@ -949,20 +1010,27 @@
             const prod = products.find(p => p.id === productId);
             if (!prod || prod.stock === 0) return;
 
+            const addAmount = cardQuantities[productId] || 1;
             const existing = cart.find(item => item.id === productId);
+
             if (existing) {
-                if (existing.qty < prod.stock) {
-                    existing.qty += 1;
+                if (existing.qty + addAmount <= prod.stock) {
+                    existing.qty += addAmount;
                 } else {
-                    alert(`Maximum available stock (${prod.stock}) reached for ${prod.name}`);
+                    alert(`Cannot add ${addAmount} item(s). Stock limit (${prod.stock}) reached for ${prod.name}`);
                     return;
                 }
             } else {
-                cart.push({ ...prod, qty: 1 });
+                cart.push({ ...prod, qty: addAmount });
             }
 
+            // Reset card selector to 1
+            cardQuantities[productId] = 1;
+            const el = document.getElementById(`cardQty-${productId}`);
+            if (el) el.innerText = 1;
+
             updateCartUI();
-            showToast(`✨ Added <strong>${prod.name}</strong> to Cart!`);
+            showToast(`✨ Added <strong>${addAmount}x ${prod.name}</strong> to Cart!`);
         }
 
         function adjustCartQty(productId, delta) {
