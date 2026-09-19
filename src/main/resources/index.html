@@ -1111,31 +1111,50 @@
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                 return 'http://localhost:8081';
             }
-            return 'https://mulesoft-order-backend.onrender.com';
+            if (window.location.hostname.includes('cloudhub.io')) {
+                return window.location.origin;
+            }
+            return 'https://mule-order-app-lpwhw5.5sc6y6-2.usa-e2.cloudhub.io';
         }
 
         async function triggerTestEmail() {
             const email = (document.getElementById('custEmail') ? document.getElementById('custEmail').value.trim() : '') || 'sramakrishnan2196@gmail.com';
+            const name = (document.getElementById('custName') ? document.getElementById('custName').value.trim() : '') || 'VIP Guest';
+            const id = (document.getElementById('custId') ? document.getElementById('custId').value.trim() : '') || 'VIP001';
             const btns = [document.getElementById('testEmailBtn'), document.getElementById('badgeTestEmailBtn')];
-            btns.forEach(b => { if (b) { b.disabled = true; b.innerText = '⏳ Sending...'; } });
+            btns.forEach(b => { if (b) { b.disabled = true; b.innerText = '⏳ Sending via MuleSoft...'; } });
 
-            showToast(`Dispatching test invoice email to ${email}...`, 'info');
+            showToast(`Dispatching live MuleSoft invoice email to ${email}...`, 'info');
 
             try {
-                const res = await fetch(`${getApiBase()}/api/test-email?to=${encodeURIComponent(email)}`);
+                const res = await fetch(`${getApiBase()}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customerId: id,
+                        customerName: name,
+                        customerEmail: email,
+                        productId: 'WT001',
+                        quantity: 1,
+                        cartItems: [
+                            { productId: 'WT001', productName: 'Royal Silk Top (Gucci)', price: 8500, quantity: 1 }
+                        ]
+                    })
+                });
                 const data = await res.json();
                 btns.forEach(b => { if (b) { b.disabled = false; b.innerText = '✉️ Test Email'; } });
 
-                if (data.success) {
-                    showToast(`✅ Test email delivered to ${email}!`, 'success');
-                    alert(`✅ Email Dispatched Successfully!\n\nRecipient: ${email}\nStatus: Verified & Sent\nMessage ID: ${data.messageId || 'Delivered'}`);
+                if (res.ok && data.success) {
+                    showToast(`✅ MuleSoft email delivered to ${email}!`, 'success');
+                    const orderRef = data.orderDetails ? data.orderDetails.orderId : 'CONFIRMED';
+                    alert(`✅ Real Email Sent by MuleSoft CloudHub!\n\nRecipient: ${email}\nOrder Reference: ${orderRef}\nStatus: Delivered to your Gmail inbox via MuleSoft <email:send>`);
                 } else {
-                    showToast(`⚠️ Email status: ${data.error || data.status || 'Check alert'}`, 'warning');
-                    alert(`Email Dispatch Result:\n\n${JSON.stringify(data, null, 2)}`);
+                    showToast(`⚠️ Order dispatch: ${data.message || 'Check alert'}`, 'warning');
+                    alert(`MuleSoft API Response:\n\n${JSON.stringify(data, null, 2)}`);
                 }
             } catch (err) {
                 btns.forEach(b => { if (b) { b.disabled = false; b.innerText = '✉️ Test Email'; } });
-                showToast(`❌ Network error contacting email service`, 'error');
+                showToast(`❌ Network error contacting MuleSoft service`, 'error');
                 console.error(err);
             }
         }
