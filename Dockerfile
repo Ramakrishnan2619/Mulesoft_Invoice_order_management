@@ -3,8 +3,7 @@
 # Stage 1: Build application with Maven
 FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
 WORKDIR /build
-COPY pom.xml .
-COPY src ./src
+COPY . .
 RUN mvn clean package -DskipTests
 
 # Stage 2: Lightweight Runtime Environment
