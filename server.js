@@ -171,18 +171,23 @@ app.post('/api/orders', async (req, res) => {
         };
 
         // Non-blocking email invoice dispatch
-        if (process.env.SMTP_PASS && process.env.SMTP_PASS !== 'default_pass') {
+        const smtpUser = (process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com').trim();
+        const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+
+        if (smtpPass && smtpPass !== 'default_pass') {
             try {
                 const transporter = nodemailer.createTransport({
-                    service: 'gmail',
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
                     auth: {
-                        user: process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com',
-                        pass: process.env.SMTP_PASS
+                        user: smtpUser,
+                        pass: smtpPass
                     }
                 });
 
                 transporter.sendMail({
-                    from: `"AURA Luxury Maison" <${process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com'}>`,
+                    from: `"AURA Luxury Maison" <${smtpUser}>`,
                     to: targetEmail,
                     subject: `AURA Order Confirmation & Tax Invoice - ${orderId}`,
                     html: `
@@ -194,13 +199,13 @@ app.post('/api/orders', async (req, res) => {
                             <strong>Total Amount Paid:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
                         </div>
                     `
-                }).then(() => console.log(`[Invoice] Email successfully sent to ${targetEmail}`))
-                  .catch(err => console.warn(`[Invoice] Email failed (${err.message}), order confirmed.`));
+                }).then(info => console.log(`[Invoice] Email successfully sent to ${targetEmail} (ID: ${info.messageId})`))
+                  .catch(err => console.error(`[Invoice] Email dispatch failed: ${err.message}`));
             } catch (setupErr) {
                 console.warn(`[Invoice] Transporter setup warning: ${setupErr.message}`);
             }
         } else {
-            console.log(`[Invoice] Order ${orderId} processed. SMTP credentials not set, invoice ready in UI.`);
+            console.log(`[Invoice] Order ${orderId} processed. SMTP credentials not set on server.`);
         }
 
         return res.status(200).json({
@@ -215,6 +220,65 @@ app.post('/api/orders', async (req, res) => {
             success: false,
             errorType: "MULE:SYSTEM_ERROR",
             message: err.message || "Internal server error during order execution."
+        });
+    }
+});
+
+// Diagnostic Email Verification Endpoint
+app.get('/api/test-email', async (req, res) => {
+    const to = req.query.to || 'sramakrishnan2196@gmail.com';
+    const smtpUser = (process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com').trim();
+    const rawPass = process.env.SMTP_PASS || '';
+    const smtpPass = rawPass.replace(/\s+/g, '');
+
+    if (!smtpPass || smtpPass === 'default_pass') {
+        return res.json({
+            configured: false,
+            status: "SMTP_PASS not configured",
+            smtpUser: smtpUser,
+            instructions: "Add SMTP_USER and SMTP_PASS in your Render Dashboard -> Environment"
+        });
+    }
+
+    try {
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: smtpUser,
+                pass: smtpPass
+            }
+        });
+
+        const info = await transporter.sendMail({
+            from: `"AURA Luxury Maison" <${smtpUser}>`,
+            to: to,
+            subject: "AURA Test Verification Email",
+            html: `
+                <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; border-radius: 8px;">
+                    <h2 style="color: #38bdf8;">✨ AURA Email Service Operational!</h2>
+                    <p>Congratulations! Your Gmail SMTP configuration on Render is working successfully.</p>
+                    <p><strong>Timestamp:</strong> ${new Date().toISOString()}</p>
+                </div>
+            `
+        });
+
+        return res.json({
+            success: true,
+            message: "Email sent successfully!",
+            messageId: info.messageId,
+            recipient: to,
+            smtpUser: smtpUser
+        });
+    } catch (err) {
+        return res.status(500).json({
+            success: false,
+            error: err.message,
+            code: err.code,
+            response: err.response,
+            smtpUser: smtpUser,
+            passLength: smtpPass.length
         });
     }
 });
