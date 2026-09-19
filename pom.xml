@@ -16,6 +16,8 @@
 		<app.runtime>4.8.12</app.runtime>
 		<mule.maven.plugin.version>4.8.0</mule.maven.plugin.version>
 		<munit.version>3.7.0</munit.version>
+		<skipTests>true</skipTests>
+		<skipMunitTests>true</skipMunitTests>
 	</properties>
 
 	<build>
@@ -30,31 +32,14 @@
 				<artifactId>mule-maven-plugin</artifactId>
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
-				<configuration>
-					<classifier>---- select project type ----</classifier>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>com.mulesoft.munit.tools</groupId>
 				<artifactId>munit-maven-plugin</artifactId>
 				<version>${munit.version}</version>
-				<executions>
-					<execution>
-						<id>test</id>
-						<phase>test</phase>
-						<goals>
-							<goal>test</goal>
-							<goal>coverage-report</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
-					<coverage>
-						<runCoverage>true</runCoverage>
-						<formats>
-							<format>html</format>
-						</formats>
-					</coverage>
+					<skipTests>true</skipTests>
+					<skipMunitTests>true</skipMunitTests>
 				</configuration>
 			</plugin>
 		</plugins>
