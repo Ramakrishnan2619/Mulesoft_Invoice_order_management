@@ -170,33 +170,37 @@ app.post('/api/orders', async (req, res) => {
             timestamp: new Date().toISOString()
         };
 
-        // Try dispatching email invoice (Graceful fallback like MuleSoft on-error-continue)
-        try {
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com',
-                    pass: process.env.SMTP_PASS || 'default_pass'
-                }
-            });
+        // Non-blocking email invoice dispatch
+        if (process.env.SMTP_PASS && process.env.SMTP_PASS !== 'default_pass') {
+            try {
+                const transporter = nodemailer.createTransport({
+                    service: 'gmail',
+                    auth: {
+                        user: process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com',
+                        pass: process.env.SMTP_PASS
+                    }
+                });
 
-            await transporter.sendMail({
-                from: `"AURA Luxury Maison" <${process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com'}>`,
-                to: targetEmail,
-                subject: `AURA Order Confirmation & Tax Invoice - ${orderId}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; border-radius: 8px;">
-                        <h2 style="color: #38bdf8;">AURA Luxury Order Confirmation</h2>
-                        <p>Dear <strong>${customerName}</strong>,</p>
-                        <p>Thank you for your purchase! Your invoice has been generated successfully.</p>
-                        <p><strong>Order ID:</strong> ${orderId}<br/>
-                        <strong>Total Amount Paid:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
-                    </div>
-                `
-            });
-            console.log(`[Invoice] Email successfully sent to ${targetEmail}`);
-        } catch (emailErr) {
-            console.warn(`[Invoice] Email dispatch failed (${emailErr.message}), order succeeded.`);
+                transporter.sendMail({
+                    from: `"AURA Luxury Maison" <${process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com'}>`,
+                    to: targetEmail,
+                    subject: `AURA Order Confirmation & Tax Invoice - ${orderId}`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; border-radius: 8px;">
+                            <h2 style="color: #38bdf8;">AURA Luxury Order Confirmation</h2>
+                            <p>Dear <strong>${customerName}</strong>,</p>
+                            <p>Thank you for your purchase! Your order invoice has been generated successfully.</p>
+                            <p><strong>Order ID:</strong> ${orderId}<br/>
+                            <strong>Total Amount Paid:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
+                        </div>
+                    `
+                }).then(() => console.log(`[Invoice] Email successfully sent to ${targetEmail}`))
+                  .catch(err => console.warn(`[Invoice] Email failed (${err.message}), order confirmed.`));
+            } catch (setupErr) {
+                console.warn(`[Invoice] Transporter setup warning: ${setupErr.message}`);
+            }
+        } else {
+            console.log(`[Invoice] Order ${orderId} processed. SMTP credentials not set, invoice ready in UI.`);
         }
 
         return res.status(200).json({

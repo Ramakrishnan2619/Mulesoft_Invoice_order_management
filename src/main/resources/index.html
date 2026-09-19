@@ -1113,7 +1113,7 @@
             if (window.location.protocol.startsWith('http') && !window.location.hostname.includes('netlify.app')) {
                 return window.location.origin;
             }
-            return localStorage.getItem('MULE_BACKEND_URL') || 'https://mulesoft-invoice-order-management.onrender.com';
+            return localStorage.getItem('MULE_BACKEND_URL') || 'https://mulesoft-order-backend.onrender.com';
         }
 
         function configureBackendUrl() {
@@ -1126,6 +1126,15 @@
                 setTimeout(() => window.location.reload(), 1000);
             }
         }
+
+        // Initialize Backend Status on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            const label = document.getElementById('backendStatusLabel');
+            if (label) {
+                const base = getApiBase();
+                label.innerText = base.includes('onrender.com') ? 'Render Cloud API' : (base.includes('localhost') ? 'Local API (8081)' : 'Backend Active');
+            }
+        });
 
         function registerCustomer() {
             const name = document.getElementById('custName').value.trim();
