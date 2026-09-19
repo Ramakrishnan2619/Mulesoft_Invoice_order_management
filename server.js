@@ -186,13 +186,45 @@ app.post('/api/orders', async (req, res) => {
 
         // Non-blocking email invoice dispatch
         const { user: smtpUser, pass: smtpPass } = resolveSmtpCredentials();
+        const resendApiKey = process.env.RESEND_API_KEY;
 
-        if (smtpPass && smtpPass !== 'default_pass') {
+        const emailSubject = `AURA Order Confirmation & Tax Invoice - ${orderId}`;
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; border-radius: 8px;">
+                <h2 style="color: #38bdf8;">AURA Luxury Order Confirmation</h2>
+                <p>Dear <strong>${customerName}</strong>,</p>
+                <p>Thank you for your purchase! Your order invoice has been generated successfully.</p>
+                <p><strong>Order ID:</strong> ${orderId}<br/>
+                <strong>Total Amount Paid:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
+            </div>
+        `;
+
+        if (resendApiKey) {
+            // Send via Resend HTTP REST API (Port 443 - Allowed on Render Free Tier)
+            fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${resendApiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: 'AURA Luxury <onboarding@resend.dev>',
+                    to: [targetEmail],
+                    subject: emailSubject,
+                    html: emailHtml
+                })
+            }).then(r => r.json())
+              .then(data => console.log(`[Invoice] Email sent via Resend API:`, data))
+              .catch(err => console.error(`[Invoice] Resend API error:`, err.message));
+        } else if (smtpPass && smtpPass !== 'default_pass') {
             try {
                 const transporter = nodemailer.createTransport({
                     host: 'smtp.gmail.com',
                     port: 465,
                     secure: true,
+                    connectionTimeout: 5000,
+                    greetingTimeout: 5000,
+                    socketTimeout: 5000,
                     auth: {
                         user: smtpUser,
                         pass: smtpPass
@@ -202,23 +234,15 @@ app.post('/api/orders', async (req, res) => {
                 transporter.sendMail({
                     from: `"AURA Luxury Maison" <${smtpUser}>`,
                     to: targetEmail,
-                    subject: `AURA Order Confirmation & Tax Invoice - ${orderId}`,
-                    html: `
-                        <div style="font-family: Arial, sans-serif; background: #0f172a; color: #f8fafc; padding: 24px; border-radius: 8px;">
-                            <h2 style="color: #38bdf8;">AURA Luxury Order Confirmation</h2>
-                            <p>Dear <strong>${customerName}</strong>,</p>
-                            <p>Thank you for your purchase! Your order invoice has been generated successfully.</p>
-                            <p><strong>Order ID:</strong> ${orderId}<br/>
-                            <strong>Total Amount Paid:</strong> ₹${totalAmount.toLocaleString('en-IN')}</p>
-                        </div>
-                    `
+                    subject: emailSubject,
+                    html: emailHtml
                 }).then(info => console.log(`[Invoice] Email successfully sent to ${targetEmail} (ID: ${info.messageId})`))
-                  .catch(err => console.error(`[Invoice] Email dispatch failed: ${err.message}`));
+                  .catch(err => console.error(`[Invoice] SMTP dispatch blocked/failed: ${err.message}`));
             } catch (setupErr) {
                 console.warn(`[Invoice] Transporter setup warning: ${setupErr.message}`);
             }
         } else {
-            console.log(`[Invoice] Order ${orderId} processed. SMTP credentials not set on server.`);
+            console.log(`[Invoice] Order ${orderId} processed. Email credentials not configured.`);
         }
 
         return res.status(200).json({
