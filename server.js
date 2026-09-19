@@ -96,6 +96,20 @@ app.post('/api/mock/notifications', (req, res) => {
     res.json({ status: "Notification Delivered" });
 });
 
+function resolveSmtpCredentials() {
+    let user = (process.env.SMTP_USER || '').trim();
+    let pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+
+    // Auto-detect if user put the 16-character app password into SMTP_USER
+    if (user && !user.includes('@') && user.length >= 16 && !pass) {
+        pass = user;
+        user = 'sramakrishnan2196@gmail.com';
+    } else if (!user) {
+        user = 'sramakrishnan2196@gmail.com';
+    }
+    return { user, pass };
+}
+
 // 5. Main Order Processing API (Mirrors MuleSoft DataWeave Business Logic)
 app.post('/api/orders', async (req, res) => {
     try {
@@ -171,8 +185,7 @@ app.post('/api/orders', async (req, res) => {
         };
 
         // Non-blocking email invoice dispatch
-        const smtpUser = (process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com').trim();
-        const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
+        const { user: smtpUser, pass: smtpPass } = resolveSmtpCredentials();
 
         if (smtpPass && smtpPass !== 'default_pass') {
             try {
@@ -227,9 +240,7 @@ app.post('/api/orders', async (req, res) => {
 // Diagnostic Email Verification Endpoint
 app.get('/api/test-email', async (req, res) => {
     const to = req.query.to || 'sramakrishnan2196@gmail.com';
-    const smtpUser = (process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com').trim();
-    const rawPass = process.env.SMTP_PASS || '';
-    const smtpPass = rawPass.replace(/\s+/g, '');
+    const { user: smtpUser, pass: smtpPass } = resolveSmtpCredentials();
 
     if (!smtpPass || smtpPass === 'default_pass') {
         return res.json({
