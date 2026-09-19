@@ -748,8 +748,9 @@
                     <label>Customer ID / Username</label>
                     <input type="text" id="custId" value="CUST001">
                 </div>
-                <div class="form-group" style="display: flex; align-items: flex-end;">
-                    <button class="btn-gold" style="width: 100%;" onclick="registerCustomer()">Save Profile</button>
+                <div class="form-group" style="display: flex; align-items: flex-end; gap: 8px;">
+                    <button class="btn-gold" style="flex: 1;" onclick="registerCustomer()">Save Profile</button>
+                    <button type="button" class="tab-btn" id="testEmailBtn" style="border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8;" onclick="triggerTestEmail()">✉️ Test Email</button>
                 </div>
             </div>
             <div id="loggedBadge" class="user-logged-badge" style="display:none;">
@@ -759,7 +760,10 @@
                     <br>
                     <small style="color:var(--accent-green);">✓ Mapped in MuleSoft Customer Directory [ID: <span id="badgeCustId">CUST001</span>]</small>
                 </div>
-                <button class="tab-btn" onclick="editCustomer()">Edit Profile</button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="tab-btn" id="badgeTestEmailBtn" style="border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8;" onclick="triggerTestEmail()">✉️ Send Test Email</button>
+                    <button class="tab-btn" onclick="editCustomer()">Edit Profile</button>
+                </div>
             </div>
         </div>
 
@@ -1108,6 +1112,32 @@
                 return 'http://localhost:8081';
             }
             return 'https://mulesoft-order-backend.onrender.com';
+        }
+
+        async function triggerTestEmail() {
+            const email = (document.getElementById('custEmail') ? document.getElementById('custEmail').value.trim() : '') || 'sramakrishnan2196@gmail.com';
+            const btns = [document.getElementById('testEmailBtn'), document.getElementById('badgeTestEmailBtn')];
+            btns.forEach(b => { if (b) { b.disabled = true; b.innerText = '⏳ Sending...'; } });
+
+            showToast(`Dispatching test invoice email to ${email}...`, 'info');
+
+            try {
+                const res = await fetch(`${getApiBase()}/api/test-email?to=${encodeURIComponent(email)}`);
+                const data = await res.json();
+                btns.forEach(b => { if (b) { b.disabled = false; b.innerText = '✉️ Test Email'; } });
+
+                if (data.success) {
+                    showToast(`✅ Test email delivered to ${email}!`, 'success');
+                    alert(`✅ Email Dispatched Successfully!\n\nRecipient: ${email}\nStatus: Verified & Sent\nMessage ID: ${data.messageId || 'Delivered'}`);
+                } else {
+                    showToast(`⚠️ Email status: ${data.error || data.status || 'Check alert'}`, 'warning');
+                    alert(`Email Dispatch Result:\n\n${JSON.stringify(data, null, 2)}`);
+                }
+            } catch (err) {
+                btns.forEach(b => { if (b) { b.disabled = false; b.innerText = '✉️ Test Email'; } });
+                showToast(`❌ Network error contacting email service`, 'error');
+                console.error(err);
+            }
         }
 
         function registerCustomer() {
