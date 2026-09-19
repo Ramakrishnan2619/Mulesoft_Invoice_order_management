@@ -315,8 +315,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: var(--radius-main);
             padding: 28px;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            transform-style: preserve-3d;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -325,7 +324,8 @@
 
         .product-card:hover {
             border-color: var(--gold-primary);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8), var(--gold-glow);
+            background: var(--bg-card-hover);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7), 0 0 25px rgba(212, 175, 55, 0.25);
         }
 
         .product-icon {
@@ -497,13 +497,15 @@
             border-left: 2px solid var(--gold-primary);
             width: 100%;
             max-width: 480px;
-            height: 100%;
-            padding: 35px;
+            height: 100vh;
+            max-height: 100vh;
+            padding: 30px 24px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             box-shadow: -20px 0 50px rgba(0,0,0,0.9);
             animation: slideInRight 0.3s ease-out;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         @keyframes slideInRight {
@@ -512,10 +514,11 @@
         }
 
         .drawer-header {
+            flex-shrink: 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
+            padding-bottom: 18px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -535,10 +538,28 @@
         .close-drawer:hover { color: #fff; }
 
         .cart-items-list {
-            flex: 1;
+            flex: 1 1 0%;
+            min-height: 0;
             overflow-y: auto;
-            margin: 20px 0;
-            padding-right: 5px;
+            overflow-x: hidden;
+            margin: 16px 0;
+            padding-right: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cart-items-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .cart-items-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        .cart-items-list::-webkit-scrollbar-thumb {
+            background: var(--gold-primary);
+            border-radius: 4px;
+        }
+        .cart-items-list::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-light);
         }
 
         .cart-item-card {
@@ -606,9 +627,10 @@
         }
 
         .cart-summary-box {
+            flex-shrink: 0;
             background: rgba(212, 175, 55, 0.05);
             border-top: 1px dashed var(--border-gold);
-            padding-top: 20px;
+            padding-top: 18px;
         }
 
         .summary-row {
@@ -951,18 +973,6 @@
                 card.className = 'product-card';
 
                 const cardQty = cardQuantities[prod.id] || 1;
-
-                // Add 3D Tilt Effect on mouse move
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left - rect.width / 2;
-                    const y = e.clientY - rect.top - rect.height / 2;
-                    card.style.transform = `rotateY(${x / 15}deg) rotateX(${-y / 15}deg)`;
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = `rotateY(0deg) rotateX(0deg)`;
-                });
 
                 const stockBadge = prod.stock > 3 
                     ? `<span class="badge badge-stock">In Stock (${prod.stock})</span>`
