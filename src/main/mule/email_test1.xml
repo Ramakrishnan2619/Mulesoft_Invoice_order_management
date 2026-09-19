@@ -133,14 +133,15 @@ output application/json
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
+var p = if (payload is Object) payload else try(() -> read(payload, "application/json")) default {}
 ---
 {
 	"success": true,
 	"message": "Customer profile mapped successfully in directory",
 	"customer": {
-		"customerId": payload.customerId default "CUST001",
-		"name": payload.name default "VIP Customer",
-		"email": payload.email default "sramakrishnan2196@gmail.com",
+		"customerId": p.customerId default "CUST001",
+		"name": p.name default "VIP Customer",
+		"email": p.email default "sramakrishnan2196@gmail.com",
 		"mappedAt": now()
 	}
 }]]></ee:set-payload>
@@ -340,123 +341,39 @@ output application/json
 			<http:response statusCode="#[vars.httpStatus default 200]" />
 			<http:error-response statusCode="#[vars.httpStatus default 500]" />
 		</http:listener>
-		<choice doc:name="Choice Mock Product">
-			<when expression="#[attributes.uriParams.productId == 'WT001']">
-				<ee:transform doc:name="WT001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
+		<ee:transform doc:name="Lookup Product Catalog">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
+var pid = attributes.uriParams.productId default ""
+var catalog = {
+	"WT001": { "productId": "WT001", "name": "Royal Silk Top (Gucci)", "price": 8500, "stock": 10 },
+	"WT002": { "productId": "WT002", "name": "Luxury Cashmere Top (Prada)", "price": 12000, "stock": 8 },
+	"WD001": { "productId": "WD001", "name": "Royal Evening Gown (Dior)", "price": 18000, "stock": 6 },
+	"WK001": { "productId": "WK001", "name": "Royal Embroidered Kurti (Gucci)", "price": 7500, "stock": 8 },
+	"WJKT001": { "productId": "WJKT001", "name": "Women Leather Jacket (Gucci)", "price": 28000, "stock": 5 },
+	"WJ001": { "productId": "WJ001", "name": "Premium Slim Fit Jeans (Gucci)", "price": 7500, "stock": 9 },
+	"MS001": { "productId": "MS001", "name": "Royal Oxford Shirt (Gucci)", "price": 8500, "stock": 12 },
+	"MS002": { "productId": "MS002", "name": "Luxury Silk Shirt (Prada)", "price": 15000, "stock": 6 },
+	"MP001": { "productId": "MP001", "name": "Tailored Wool Trousers (Gucci)", "price": 9000, "stock": 10 },
+	"MJKT001": { "productId": "MJKT001", "name": "Men Leather Jacket (Gucci)", "price": 30000, "stock": 7 },
+	"MH001": { "productId": "MH001", "name": "Luxury Cashmere Hoodie (Gucci)", "price": 15000, "stock": 8 },
+	"MSW001": { "productId": "MSW001", "name": "Cashmere Sweatshirt (Gucci)", "price": 12000, "stock": 10 },
+	"PROD123": { "productId": "PROD123", "name": "Italian Silk Tuxedo", "price": 45000, "stock": 10 },
+	"PROD456": { "productId": "PROD456", "name": "Luxury Leather Belt", "price": 800, "stock": 2 }
+}
+var found = catalog[pid]
 ---
-{ "productId": "WT001", "name": "Royal Silk Top (Gucci)", "price": 8500, "stock": 10 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'WT002']">
-				<ee:transform doc:name="WT002">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "WT002", "name": "Luxury Cashmere Top (Prada)", "price": 12000, "stock": 8 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'WD001']">
-				<ee:transform doc:name="WD001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "WD001", "name": "Royal Evening Gown (Dior)", "price": 18000, "stock": 6 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'WJKT001']">
-				<ee:transform doc:name="WJKT001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "WJKT001", "name": "Women Leather Jacket (Gucci)", "price": 28000, "stock": 5 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'MS001']">
-				<ee:transform doc:name="MS001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "MS001", "name": "Royal Oxford Shirt (Gucci)", "price": 8500, "stock": 12 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'MP001']">
-				<ee:transform doc:name="MP001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "MP001", "name": "Tailored Wool Trousers (Gucci)", "price": 9000, "stock": 10 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'MJKT001']">
-				<ee:transform doc:name="MJKT001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "MJKT001", "name": "Men Leather Jacket (Gucci)", "price": 30000, "stock": 7 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'MH001']">
-				<ee:transform doc:name="MH001">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "MH001", "name": "Luxury Cashmere Hoodie (Gucci)", "price": 15000, "stock": 8 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'PROD123']">
-				<ee:transform doc:name="PROD123">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "PROD123", "name": "Italian Silk Tuxedo", "price": 45000, "stock": 10 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<when expression="#[attributes.uriParams.productId == 'PROD456']">
-				<ee:transform doc:name="PROD456">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{ "productId": "PROD456", "name": "Luxury Leather Belt", "price": 800, "stock": 2 }]]></ee:set-payload>
-					</ee:message>
-				</ee:transform>
-			</when>
-			<otherwise>
-				<ee:transform doc:name="Product Not Found">
-					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-	"error": "Product not found"
-}]]></ee:set-payload>
-					</ee:message>
-					<ee:variables>
-						<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
-					</ee:variables>
-				</ee:transform>
-			</otherwise>
-		</choice>
+if (found != null)
+	found
+else if (pid startsWith "OUT_OF_STOCK")
+	{ "productId": pid, "name": "Out of Stock Item", "price": 5000, "stock": 0 }
+else if (pid startsWith "INVALID")
+	{ "error": "Product not found" }
+else
+	{ "productId": pid, "name": "Luxury Product (" ++ pid ++ ")", "price": 9500, "stock": 15 }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 
 	<!-- MOCK ORDER API FLOW -->
