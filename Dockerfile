@@ -1,16 +1,18 @@
-# Multi-Stage Dockerfile for Automated Render Cloud Deployment
+# Production Cloud Dockerfile for Render Deployment
+FROM node:18-alpine
 
-# Stage 1: Build application with Maven
-FROM maven:3.9.6-eclipse-temurin-17-alpine AS builder
-WORKDIR /build
-COPY . .
-RUN mvn clean package -DskipTests
-
-# Stage 2: Lightweight Runtime Environment
-FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=builder /build/target/email_test1-1.0.0-SNAPSHOT-mule-application.jar /app/mule-app.jar
 
+# Install app dependencies
+COPY package*.json ./
+RUN npm install --production
+
+# Copy full application code and frontend resources
+COPY . .
+
+# Expose HTTP port (Render dynamically sets $PORT)
+ENV PORT=8081
 EXPOSE 8081
 
-CMD ["java", "-jar", "/app/mule-app.jar"]
+# Launch the cloud backend service
+CMD ["node", "server.js"]
