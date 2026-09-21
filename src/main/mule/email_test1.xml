@@ -22,8 +22,10 @@
 		<http:request-connection host="localhost" port="8081" />
 	</http:request-config>
 
+	<configuration-properties file="config.properties" doc:name="Configuration properties" />
+
 	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP">
-		<email:smtp-connection host="smtp.gmail.com" port="587" user="mulesoftautomatedbot@gmail.com" password="dtovconmqcoyowzg">
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="${email.user}" password="${email.password}">
 			<email:properties>
 				<email:property key="mail.smtp.starttls.enable" value="true" />
 				<email:property key="mail.smtp.starttls.required" value="true" />

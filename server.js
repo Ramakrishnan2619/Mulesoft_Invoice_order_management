@@ -98,7 +98,7 @@ app.post('/api/mock/notifications', (req, res) => {
 
 function resolveSmtpCredentials() {
     let user = (process.env.SMTP_USER || 'mulesoftautomatedbot@gmail.com').trim();
-    let pass = (process.env.SMTP_PASS || 'dtovconmqcoyowzg').replace(/\s+/g, '');
+    let pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '');
 
     // Auto-detect if user put the 16-character app password into SMTP_USER
     if (user && !user.includes('@') && user.length >= 16) {

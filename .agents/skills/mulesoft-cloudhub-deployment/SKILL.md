@@ -108,7 +108,7 @@ Google deprecated "Less Secure Apps". Standard account passwords will fail with 
 2. Ensure **2-Step Verification** is turned ON.
 3. Search for **App passwords** in the top search bar.
 4. Create an App Password named "MuleSoft Bot".
-5. Copy the 16-character code (e.g., `dtovconmqcoyowzg`).
+5. Copy the 16-character code (e.g., `abcd efgh ijkl mnop`).
 
 ### B. Cloud Egress Considerations (Why Render/Free Hosts Fail)
 Free cloud hosts (such as Render, Vercel Serverless, Railway Free) block all outbound TCP traffic on ports 25, 465, and 587 (`ETIMEDOUT`). CloudHub 2.0 allows outbound SMTP traffic on ports 465 and 587.

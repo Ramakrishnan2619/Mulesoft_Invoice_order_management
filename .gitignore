@@ -47,3 +47,5 @@ target/
 velocity.log
 node_modules/
 .env
+config.properties
+secure*.properties

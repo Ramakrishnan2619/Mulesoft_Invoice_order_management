@@ -136,7 +136,11 @@ Standard Google passwords do not work with automated SMTP clients.
 * Go to [Google Account Security](https://myaccount.google.com/security).
 * Turn ON **2-Step Verification**.
 * Search for **App passwords**.
-* Create an App Password for **MuleSoft Bot** and copy the 16-character code (e.g., `dtovconmqcoyowzg`).
+* Create an App Password for **MuleSoft Bot** and copy the 16-character code (e.g., `abcd efgh ijkl mnop`).
+
+> ⚠️ **CRITICAL SECURITY BEST PRACTICE**:
+> Never commit your 16-character App Password to public GitHub!
+> Store it in `src/main/resources/config.properties` (added to `.gitignore`) or configure it directly in CloudHub Runtime Manager under the **Properties** tab.
 
 ### 2. Cloud Egress Secrets (Why Render Failed & CloudHub Succeeded)
 * **Free tier cloud hosts (Render, Railway, Vercel Serverless)**: Block outbound TCP ports 25, 465, and 587 by default to prevent spam. Any connection to Gmail SMTP times out (`ETIMEDOUT`).
@@ -144,8 +148,10 @@ Standard Google passwords do not work with automated SMTP clients.
 
 ### 3. Mule SMTP Configuration in `email_test1.xml`
 ```xml
+<configuration-properties file="config.properties" doc:name="Configuration properties" />
+
 <email:smtp-config name="Email_SMTP" doc:name="Email SMTP">
-    <email:smtp-connection host="smtp.gmail.com" port="587" user="mulesoftautomatedbot@gmail.com" password="dtovconmqcoyowzg">
+    <email:smtp-connection host="smtp.gmail.com" port="587" user="${email.user}" password="${email.password}">
         <email:properties>
             <email:property key="mail.smtp.starttls.enable" value="true" />
             <email:property key="mail.smtp.starttls.required" value="true" />
