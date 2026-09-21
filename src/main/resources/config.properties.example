@@ -1,0 +1,6 @@
+# MuleSoft Email SMTP Configuration Template
+# Duplicate this file and rename to 'config.properties' (which is git-ignored)
+# or configure these properties directly in CloudHub Runtime Manager Properties tab.
+
+email.user=your_email@gmail.com
+email.password=your_16_character_google_app_password
